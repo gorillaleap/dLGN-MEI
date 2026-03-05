@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python C:Users49851.claudeteststest_new_interface.py)",
+      "Bash(python C:Users49851.claudeteststest_simple.py)",
+      "Bash(python \"C:\\\\Users\\\\49851\\\\.claude\\\\tests\\\\test_simple.py\")",
+      "Bash(python C:Users49851.claudeteststest_print.py)",
+      "Bash(python d:Claud Codeinception_loop2019-masterinception_loop2019-mastertest_pipeline.py)",
+      "Bash(python \"d:\\\\Claud Code\\\\inception_loop2019-master\\\\inception_loop2019-master\\\\test_pipeline.py\")",
+      "Bash(python d:Claud Codeinception_loop2019-masterinception_loop2019-mastertest_simple.py)",
+      "Bash(py d:Claud Codeinception_loop2019-masterinception_loop2019-mastertest_simple.py)",
+      "Bash(/c/Users/49851/AppData/Local/Microsoft/WindowsApps/python d:Claud Codeinception_loop2019-masterinception_loop2019-mastertest_simple.py)",
+      "Bash(python -c \"import torch; print\\(''PyTorch版本:'', torch.__version__\\)\")",
+      "Bash(python -c \"print\\(''Hello, World!''\\)\")",
+      "Bash(py d:Claud Codeinception_loop2019-masterinception_loop2019-mastertest_pipeline.py)",
+      "Bash(python3 d:Claud Codeinception_loop2019-masterinception_loop2019-mastertest_pipeline.py)",
+      "Bash(/c/Users/49851/AppData/Local/Microsoft/WindowsApps/python3 d:Claud Codeinception_loop2019-masterinception_loop2019-mastertest_pipeline.py)",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe d:Claud Codeinception_loop2019-masterinception_loop2019-mastertest_pipeline.py)",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe \"d:/Claud Code/inception_loop2019-master/inception_loop2019-master/test_pipeline.py\")",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe -m pip install torch)",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe -m pip install torch --no-cache-dir --index-url https://download.pytorch.org/whl/cpu)",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe d:Claud Codeinception_loop2019-masterinception_loop2019-mastertest_simple_pipeline.py)",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe \"d:/Claud Code/inception_loop2019-master/inception_loop2019-master/test_simple_pipeline.py\")",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe \"d:/Claud Code/inception_loop2019-master/inception_loop2019-master/test_pipeline_fixed.py\")",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe \"d:/Claud Code/inception_loop2019-master/inception_loop2019-master/test_pipeline_simple.py\")",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe \"d:/Claud Code/inception_loop2019-master/inception_loop2019-master/test_pipeline_module_dict.py\")",
+      "Bash(python test_mei.py)",
+      "Bash(python -c \"import torch; print\\(torch.__version__\\)\")",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe test_mei.py)",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe -m pip install scipy)",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe -m pip install \"numpy<2\")",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe test_mei_real.py)",
+      "Bash(ls \"D:/mouse-lgn-movie-main/mouse-lgn-movie-main/movie_2025_04_22/inst0\"/*.png)",
+      "Bash(identify -format \"%wx%h\\\\n\" \"D:/mouse-lgn-movie-main/mouse-lgn-movie-main/movie_2025_04_22/inst0/000001.png\")",
+      "Bash(python -c \"from PIL import Image; img = Image.open\\(''D:/mouse-lgn-movie-main/mouse-lgn-movie-main/movie_2025_04_22/inst0/000001.png''\\); print\\(f''{img.width}x{img.height}''\\)\")",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe -c \"from PIL import Image; img = Image.open\\(''D:/mouse-lgn-movie-main/mouse-lgn-movie-main/movie_2025_04_22/inst0/000001.png''\\); print\\(f''{img.width}x{img.height}''\\)\")",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe -c \"import glob; files = glob.glob\\(''D:/mouse-lgn-movie-main/mouse-lgn-movie-main/movie_2025_04_22/inst0/*.png''\\); print\\(f''Total PNG files: {len\\(files\\)}''\\)\")",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe generate_stim_mat.py)",
+      "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe \"d:/Claud Code/train_pro_high_res.py\")",
+      "Bash(set PYTHONIOENCODING=utf-8)"
+    ]
+  }
+}

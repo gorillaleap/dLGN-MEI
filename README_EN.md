@@ -1,3 +1,4 @@
+**English** | [简体中文](README.md)
 # 🧠 MEI Generator - Maximum Excitatory Image Generation Engine
 
 > **Digital Twin × Flattened Training × Two-Stage Optimization** - The Ultimate Solution for Visual Neuron Encoding

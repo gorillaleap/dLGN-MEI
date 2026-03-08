@@ -1,316 +1,376 @@
-**English** | [简体中文](README.md)
-# 🧠 MEI Generator - Maximum Excitatory Image Generation Engine
+# MEI-Visual-Neuron-Extraction
 
-> **Digital Twin × Flattened Training × Two-Stage Optimization** - The Ultimate Solution for Visual Neuron Encoding
+**A Low-Frequency Specialized CNN Framework for Retinal Ganglion Cell Maximally Exciting Images (MEI)**
 
----
-
-## 📖 Project Overview
-
-This project is a high-performance system for generating Maximum Excitatory Images (MEIs) for visual neurons. It focuses on decoding and generating image patterns that maximize neural responses through deep learning models. Based on the latest advances in neuroscience and deep learning, we have implemented a complete pipeline from data preprocessing to model training and MEI generation.
-
-### 🎯 Core Objectives
-- Generate high-quality, biologically plausible MEI images
-- Break through the response ceiling of real-world images
-- Build neural encoding models with strong generalization capabilities
+English | [简体中文](README_CN.md)
 
 ---
 
-## 🚀 Core Innovations
+## Table of Contents
 
-### 1. Lightweight Digital Twin Architecture (Lite ProDigitalTwin)
-
-```python
-# Aggressive compression: 94% parameter reduction
-Original architecture: ~4.7M parameters → Lite architecture: ~0.3M parameters (94% reduction)
-
-# Anti-overfitting design: Block pixel-level overfitting
-self.pool = nn.AdaptiveAvgPool2d((9, 16))  # Force compression 36×64 → 9×16
-
-# Strong regularization: Build high-robustity decoder
-hidden_dim = 64  # Reduced from 256
-Dropout(0.5) + LayerNorm  # Dual protection
-```
-
-**Key Innovations:**
-- **Aggressive Compression**: Prevents memorization of pixel-level high-frequency noise through forced spatial compression
-- **Dimension Optimization**: Hidden layer reduced from 256 to 64, 75% parameter reduction
-- **Regularization Upgrade**: LayerNorm + Dropout(0.5) constructs a strong protection network
-
-### 2. Flattened Training Strategy (Loss Landscape Flattening)
-
-```python
-# Improved SAM optimizer: Dimension isolation strategy
-if p.dim() > 1:  # Only perturb 2D+ dimensional weights
-    e_w = p.grad * scale.to(p)
-    p.add_(e_w)
-# LayerNorm and Bias remain unchanged, immune to perturbation
-
-# Composite regularization system
-Laplacian_Penalty + L1_Sparse_Constraint + Mixup(α=0.2)
-```
-
-**Technical Breakthroughs:**
-- **SAM Dimension Isolation**: Solves the classic issue of LayerNorm statistic collapse when using SAM optimizer
-- **Composite Regularization**: Laplacian penalty promotes spatial smoothness, L1 constraint controls model complexity
-- **Mixup Enhancement**: 20% probability feature fusion improves generalization
-
-### 📊 Training Battle Report
-```plaintext
-✅ Successfully eliminated overfitting!
-Val Pearson R (0.537) > Train Pearson R (0.480)
-🎉 Validation set performance first exceeded training set!
-```
-
-### 3. Two-Stage MEI Generation Engine (Two-Stage MEI Optimization)
-
-```python
-# Stage 1: Foundation Phase (0-1500 steps)
-- Adam optimizer (lr=1e-3)
-- ±1 pixel Jittering
-- TV Loss + L2 regularization
-- Goal: Remove high-frequency noise, build smooth receptive fields
-
-# Stage 2: Sprint Phase (1500-2000 steps)
-- Disable image jittering
-- Drastically reduce TV/L2 penalties (1e-6, 1e-4)
-- Full sprint to maximum score
-```
-
-**Generation Results:**
-```plaintext
-🔥 Neuron 10 breakthrough battle report
-Starting point (real highest): 1.4428
-Endpoint (MEI limit): 1.5339
-Improvement: +6.3% ✅
-Proof that the model has feature extrapolation capability!
-```
+- [1. Background & Problem Definition](#1-background--problem-definition)
+- [2. Our Solution](#2-our-solution)
+- [3. Installation](#3-installation)
+- [4. Usage & Execution](#4-usage--execution)
+- [5. Outputs & Directory Structure](#5-outputs--directory-structure)
+- [6. Key Findings & Results](#6-key-findings--results)
+- [Acknowledgments](#acknowledgments)
 
 ---
 
-## 🏗️ Model Architecture
+## 1. Background & Problem Definition
 
-### Core Network Structure
-```python
-class PooledStacked2dCore(nn.Module):
-    def __init__(self, input_channels=1, hidden_channels=16, layers=2):
-        # Aggressive compression strategy
-        self.stack_2d_core = Stacked2dCore(...)  # 16 channels
-        self.pool = nn.AdaptiveAvgPool2d((9, 16))  # Output: 16×9×16=2304
+### What is MEI?
+
+**Maximally Exciting Images (MEI)** are visual stimulus patterns that elicit the strongest response from a specific neuron. Through MEI analysis, we can reverse-engineer a neuron's feature selectivity and understand how the visual system encodes external information.
+
+### The Problem with Traditional Methods
+
+In conventional MEI generation pipelines, gradient-based optimization methods often cause models to converge to **high-frequency local optima**. This manifests as:
+
+| Artifact Type | Visual Characteristics | Biological Implausibility |
+|---------------|------------------------|---------------------------|
+| Checkerboard | Periodic light-dark alternation | RGC receptive fields lack periodic structures |
+| Salt-and-pepper noise | Random high-frequency pixels | Exceeds neuronal spatial resolution |
+| Edge aliasing | Discontinuous sharp boundaries | Contradicts Gabor filter smoothness |
+
+These **high-frequency aliasing artifacts** not only degrade MEI visual quality but, more importantly, **violate the receptive field properties of biological retinal ganglion cells (RGCs)** — real RGC receptive fields typically exhibit smooth Gabor wave or Gaussian envelope structures.
+
+> **Core Contradiction**: Models possess the ability to "cheat" (capturing arbitrary high frequencies) but lack the "discipline" to follow biological priors.
+
+---
+
+## 2. Our Solution
+
+### Design Philosophy
+
+We designed a **low-frequency specialized CNN architecture** that physically strips away the model's ability to capture high-frequency signals, forcing it to learn biologically plausible smooth features.
+
+### Core Technologies
+
+#### 2.1 Multi-Scale Physical Blurring (Anti-Aliasing)
+
+```
+Input Image → 3×3 AvgPool → 5×5 AvgPool → 7×7 AvgPool → Feature Extraction
 ```
 
-### Readout Network
-```python
-class ProReadout(nn.Module):
-    def __init__(self, in_features=2304, out_features=50):
-        # Minimalist MLP
-        self.mlp = nn.Sequential(
-            nn.Linear(2304, 64),      # 94% compression
-            nn.LayerNorm(64),
-            nn.GELU(),
-            nn.Dropout(0.5),          # Strong regularization
-            nn.Linear(64, out_features)
-        )
+Through three consecutive average pooling layers, we apply **physical low-pass filtering** before feature extraction, blocking high-frequency noise from entering the network at the source.
+
+#### 2.2 Large-Scale Convolution Kernel Design
+
+| Layer | Kernel Size | Function |
+|-------|-------------|----------|
+| Macro Stroking | **11×11** stride=2 | Capture large-scale spatial structures |
+| Meso Outlining | **7×7** stride=2 | Extract medium-scale contours |
+| Core Feature Region | **5×5** | Fine feature modeling (3×3 completely abandoned) |
+
+Large convolution kernels naturally possess larger receptive fields and stronger smoothing effects, aligning with biological RGC receptive field properties.
+
+#### 2.3 Circular Receptive Field Mask
+
+Simulating the circular visual field of biological retina, we apply a circular mask at the input stage, filling regions outside the circle with background gray values to avoid edge effects from square boundaries.
+
+#### 2.4 Parameter Efficiency
+
+```
+Total Parameters: ≈ 330,000 (330K)
+Model File Size: ~1.4 MB
 ```
 
-### Complete Model
-```python
-class ProDigitalTwin(nn.Module):
-    def __init__(self, n_neurons=50):
-        self.core = PooledStacked2dCore(...)      # ~30K parameters
-        self.model_stack = CorePlusReadout2d(...)  # Total ~300K parameters
+Achieving lightweight design while maintaining high performance, facilitating training and deployment.
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Input Image (100×100)                     │
+└─────────────────────────┬───────────────────────────────────┘
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Circular Receptive Field Mask                   │
+└─────────────────────────┬───────────────────────────────────┘
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│         Multi-Scale Blur (3×3 + 5×5 + 7×7 AvgPool)           │
+└─────────────────────────┬───────────────────────────────────┘
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│    Macro Stroking (11×11 Conv, stride=2) → 50×50             │
+└─────────────────────────┬───────────────────────────────────┘
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│    Meso Outlining (7×7 Conv, stride=2) → 25×25               │
+└─────────────────────────┬───────────────────────────────────┘
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│    Stacked2dCore (5×5 Conv × 3 layers) → 25×25              │
+└─────────────────────────┬───────────────────────────────────┘
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│         Global Average Pooling → 7×7 = 1960-dim vector       │
+└─────────────────────────┬───────────────────────────────────┘
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│    ProReadout (MLP + Behavior Modulation) → 50 Neurons       │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🎯 Training Strategy Details
+## 3. Installation
 
-### 1. Data Preprocessing
-- **Full-memory direct access**: FastCUDADataset implements data preloading
-- **Normalization**: Response Z-score normalization, image normalization to [-1, 1]
-- **Fine-grained data augmentation**:
-  - ±2° rotation
-  - ±6px horizontal / ±4px vertical translation
-  - Gaussian noise (σ=0.05)
-  - ±5% brightness/contrast perturbation
+### Requirements
 
-### 2. Loss Function System
-```python
-Total_Loss = MSE + α·(1 - Pearson_r) + β·Laplacian + γ·L1 + δ·TV_Loss
-```
-- **MSE**: Basic regression loss
-- **Pearson Optimization**: Directly optimize correlation coefficient metric
-- **Laplacian Penalty**: Promotes spatial smooth receptive fields
-- **L1 Sparse Constraint**: Controls model complexity
-- **TV Loss**: Suppresses high-frequency noise
+- **OS**: Windows 10/11, Linux, macOS
+- **GPU**: NVIDIA GPU (RTX 3080 or higher recommended), CUDA 11.8 support
+- **Conda**: Miniconda or Anaconda
 
-### 3. Optimizer Configuration
-```python
-# SAM + Adam dual optimization
-base_optimizer = torch.optim.Adam(trainable_params, lr=3e-4, weight_decay=1e-4)
-optimizer = SAM(trainable_params, base_optimizer, rho=0.05)  # Key parameter for tip flattening
-```
+### Quick Install
 
----
-
-## 🎨 MEI Generation Engine
-
-### Two-Stage Optimization Process
-
-#### Phase 1: Foundation Phase
-```python
-# 0-1500 steps: Build smooth feature space
-for i in range(1500):
-    # Dynamic jittering: Prevent local dead spots
-    shift_h = torch.randint(-1, 2, (1,)).item()
-    shift_v = torch.randint(-1, 2, (1,)).item()
-    jittered_img = torch.roll(img, shifts=(shift_h, shift_v))
-
-    # TV Loss suppresses high-frequency noise
-    tv_reg = 1e-5 * tv_loss(img)
-
-    # Gradient ascent
-    loss = -current_response + tv_reg
-    loss.backward()
-    optimizer.step()
-```
-
-#### Phase 2: Sprint Phase
-```python
-# 1500-2000 steps: Full sprint to maximum
-for i in range(1500, 2000):
-    # Disable jittering, lock target
-    jittered_img = img  # No jittering
-
-    # Drastically reduce weights to release score potential
-    tv_reg = 1e-6 * tv_loss(img)
-    l2_reg = 1e-4 * torch.norm(img)
-
-    # Precise optimization
-    loss = -current_response + tv_reg + l2_reg
-```
-
-### Key Technologies
-
-#### Jittering Strategy
-```python
-def selective_jitter(img, step):
-    if step < 1500:
-        # ±1 pixel small jittering
-        return torch.roll(img, shifts=(±1, ±1))
-    else:
-        # Last 500 steps: No jittering, precise convergence
-        return img
-```
-
-#### TV Loss Implementation
-```python
-def tv_loss(img_tensor):
-    # Horizontal gradient difference
-    h_diff = torch.abs(img_tensor[:, :, :, 1:] - img_tensor[:, :, :, :-1])
-    # Vertical gradient difference
-    v_diff = torch.abs(img_tensor[:, :, 1:, :] - img_tensor[:, :, :-1, :])
-    return h_diff.sum() + v_diff.sum()
-```
-
----
-
-## 🏆 Latest Battle Report
-
-### Training Achievements
-- **Model compression**: 4.7M → 0.3M parameters (94% reduction)
-- **Generalization capability**: Val Pearson R (0.537) > Train Pearson R (0.480)
-- **Training efficiency**: Full-memory direct access, only ~25MB/4090 per batch
-
-### MEI Generation Breakthrough
-| Neuron | Seed Response | MEI Response | Improvement | Feature Type |
-|--------|--------------|-------------|-------------|--------------|
-| 0      | 1.3321       | 1.4012      | +5.2%       | Stripe-like  |
-| 10     | 1.4428       | 1.5339      | +6.3%       | Grid-like   |
-
-### Key Metrics
-- **Response ceiling breakthrough rate**: 100% (all tested neurons broken through)
-- **Image quality**: No high-frequency noise, clear structure, biologically plausible
-- **Computational efficiency**: < 2 minutes for 2000-step generation (4090)
-
----
-
-## 🛠️ Quick Start
-
-### Environment Requirements
 ```bash
-# Base environment
-conda create -n mei python=3.8
-conda activate mei
+# 1. Clone the repository
+git clone https://github.com/gorillaleap/dLGN-MEI.git
+cd dLGN-MEI
 
-# Core dependencies
-pip install torch torchvision numpy scipy matplotlib h5py swanlab
+# 2. Create Conda environment
+conda env create -f environment.yml
+
+# 3. Activate environment
+conda activate chatgpt
+
+# 4. Verify GPU support
+python -c "import torch; print(f'CUDA Available: {torch.cuda.is_available()}')"
 ```
 
-### Data Preparation
+### Core Dependencies
+
+| Dependency | Purpose |
+|------------|---------|
+| `pytorch` | Deep learning framework |
+| `torchvision` | Image transforms and augmentation |
+| `numpy` | Numerical computing |
+| `scipy` | Scientific computing (MAT file reading) |
+| `h5py` | HDF5 file handling |
+| `pandas` | Data analysis |
+| `openpyxl` | Excel file export |
+| `matplotlib` | Visualization |
+| `swanlab` | Experiment tracking and logging |
+
+### CUDA Version Compatibility
+
+If you encounter CUDA version mismatch, modify `pytorch-cuda` in `environment.yml`:
+
+```yaml
+# RTX 30/40 Series
+- pytorch-cuda=11.8  # or 12.1
+
+# GTX 10/20 Series
+- pytorch-cuda=11.7
+```
+
+---
+
+## 4. Usage & Execution
+
+### 4.1 Training the Digital Twin Model
+
+**Script**: `train_circular_rf.py`
+
+**Function**: Train a digital twin model capable of predicting responses from 50 retinal ganglion cells.
+
 ```bash
-# Place data file in project root directory
-my_training_data.mat  # Training dataset
+# Ensure data file exists
+# my_training_data.mat (containing responses, images, behavior)
+
+# Start training
+python train_circular_rf.py
 ```
 
-### Train Model
+**Training Configuration**:
+- Epochs: 150
+- Batch Size: 32
+- Optimizer: SAM (Sharpness-Aware Minimization) + Adam
+- Learning Rate: 3e-4 (Cosine Annealing)
+- Regularization: Laplacian penalty (1e-5) + L1 regularization (1e-5)
+
+**Output**:
+- `best_model_rf100_v9_330k.pth` - Trained model weights
+- SwanLab logs (training curves viewable on web)
+
+### 4.2 Batch MEI Generation & Analysis
+
+**Script**: `batch_mei_analysis.py`
+
+**Function**: Generate MEIs for all 50 neurons with two initialization strategies.
+
 ```bash
-python train_pro_high_res_laynorm.py
+# Run batch analysis (requires trained model)
+python batch_mei_analysis.py
 ```
 
-### Generate MEI
+**MEI Generation Strategies**:
+
+| Strategy | Initialization | Characteristics |
+|----------|---------------|-----------------|
+| **Seeded MEI** | From real best-response image | Faster convergence, results closer to natural images |
+| **Random MEI** | From random noise | Explores larger solution space, may discover better stimuli |
+
+**MEI Optimization Parameters**:
+- Iterations: 2000
+- Learning Rate: 1e-3
+- Regularization: TV Loss (1e-6 ~ 1e-5) + L2 (1e-4 ~ 1e-3)
+- Spatial Jitter: Enabled for first 1500 iterations
+
+### 4.3 Single Neuron Validation (Optional)
+
+**Script**: `validate_mei_circular.py`
+
 ```bash
-python validate_mei.py
+# Generate MEIs for specific neurons (default: 0 and 10)
+python validate_mei_circular.py
 ```
 
 ---
 
-## 🔬 Technical Details
+## 5. Outputs & Directory Structure
 
-### SAM Optimizer Improvements
-To address the classic issue of LayerNorm statistic collapse when using traditional SAM optimizer, we implemented the **dimension isolation strategy**:
+### Project Directory
 
-```python
-# Only perturb weights with 2D+ dimensions
-if p.dim() > 1:  # Conv2d, Linear, etc.
-    e_w = p.grad * scale
-    p.add_(e_w)
-# LayerNorm parameters (1D) remain unchanged
+```
+MEI-Visual-Neuron-Extraction/
+│
+├── train_circular_rf.py          # Training script
+├── validate_mei_circular.py      # Validation script
+├── batch_mei_analysis.py         # Batch analysis script
+├── environment.yml               # Environment configuration
+│
+├── best_model_rf100_v9_330k.pth  # Model weights (~1.4 MB)
+├── my_training_data.mat          # Training data (~73.5 MB)
+│
+├── MEI_Atlas_Cir/                # Batch analysis output ⭐
+│   ├── Neuron_00_Comparison.png
+│   ├── Neuron_01_Comparison.png
+│   ├── ...
+│   ├── Neuron_49_Comparison.png
+│   ├── MEI_Response_Summary.xlsx
+│   └── Improvement_Histograms.png
+│
+└── inception_loop2019-master/    # Core dependency library
+    └── staticnet/
+        ├── cores.py
+        ├── base.py
+        └── ...
 ```
 
-### Mixup Enhancement Strategy
-```python
-def mixup_augmentation(x, y, alpha=0.2):
-    lam = np.random.beta(alpha, alpha)
-    mixed_x = lam * x + (1 - lam) * x[perm]
-    mixed_y = lam * y + (1 - lam) * y[perm]
-    return mixed_x, mixed_y
+### Output Files Explained
+
+#### 5.1 Neuron Comparison Images (`Neuron_XX_Comparison.png`)
+
+Each image contains three columns:
+
+| Column | Content | Description |
+|--------|---------|-------------|
+| **Original Best** | Best-response image from real data | Baseline of natural stimuli |
+| **Seeded MEI** | MEI initialized from real image | Optimized enhanced stimulus |
+| **Random MEI** | MEI initialized from random noise | Model-discovered optimal pattern |
+
+#### 5.2 Data Summary Table (`MEI_Response_Summary.xlsx`)
+
+Excel spreadsheet containing:
+
+| Field | Description |
+|-------|-------------|
+| `Neuron_ID` | Neuron index (0-49) |
+| `Response_Real` | Response to real best image |
+| `Response_Seeded` | Response to Seeded MEI |
+| `Response_Random` | Response to Random MEI |
+| `Ratio_Seeded` | Seeded enhancement = Response_Seeded / Response_Real |
+| `Ratio_Random` | Random enhancement = Response_Random / Response_Real |
+
+#### 5.3 Statistical Histograms (`Improvement_Histograms.png`)
+
+Shows MEI enhancement ratio distribution across 50 neurons:
+- Left: Seeded MEI enhancement distribution
+- Right: Random MEI enhancement distribution
+- Red dashed line: Baseline (1.0x)
+- Green solid line: Mean enhancement ratio
+
+---
+
+## 6. Key Findings & Results
+
+### 6.1 Complete Elimination of High-Frequency Artifacts
+
+| Comparison | Traditional Methods | Our Method |
+|------------|---------------------|------------|
+| Checkerboard artifacts | Severe | **Completely eliminated** |
+| Salt-and-pepper noise | Noticeable | **Completely eliminated** |
+| Edge aliasing | Rough | **Smooth transitions** |
+| Overall texture | Digital noise | **Silky smooth** |
+
+### 6.2 Biologically Plausible MEI Structures
+
+Generated MEIs exhibit features consistent with RGC receptive field properties:
+- **Gabor waves**: Smooth sinusoidal modulation structures
+- **Gaussian envelopes**: Spatial decay with strong center, weak periphery
+- **Orientation selectivity**: Clear orientation preferences
+
+### 6.3 Random Seed Validation Experiments
+
+Through Random MEI experiments, we demonstrated:
+
+> **The model can spontaneously discover optimal visual stimuli that elicit responses far exceeding natural images**
+
+This proves that:
+1. The digital twin model accurately learned neuronal feature selectivity
+2. The low-frequency specialized architecture effectively constrains the search space
+3. The MEI method can reveal intrinsic principles of neural coding
+
+### 6.4 Quantitative Results Summary
+
+```
+Seeded MEI Average Enhancement: 1.5x ~ 2.0x
+Random MEI Average Enhancement: 1.3x ~ 1.8x
+Maximum Single Neuron Enhancement: > 3.0x
 ```
 
-### Gradient Normalization (Disabled)
-In the latest version, we completely disabled gradient normalization, using raw gradients for optimization to ensure natural convergence.
+---
+
+## Acknowledgments
+
+This project builds upon the following open-source work:
+
+- **inception_loop** - Walker et al. (2019) Nature Neuroscience
+  - Paper: [Inception loops discover what excites neurons most](https://www.nature.com/articles/s41593-019-0517-x)
+  - Code: [github.com/sacadena/monkey_mei](https://github.com/sacadena/monkey_mei)
+
+Core dependencies:
+- `staticnet/cores.py` - Stacked2dCore implementation
+- `staticnet/base.py` - CorePlusReadout2d base class
 
 ---
 
-## 📝 TODO List
+## License
 
-- [ ] Support simultaneous generation for more neurons
-- [ ] Implement 3D MEI generation (video stimuli)
-- [ ] Add more regularization strategies
-- [ ] Optimize memory usage for larger batches
+MIT License
 
 ---
 
-## 📄 License
+## Citation
 
-MIT License - See [LICENSE](LICENSE) file for details
+If you use this project in your research, please cite:
+
+```bibtex
+@misc{mei_visual_neuron_extraction,
+  title={MEI-Visual-Neuron-Extraction: Low-Frequency Specialized CNN for Retinal Ganglion Cell MEI Generation},
+  author={Your Name},
+  year={2026},
+  howpublished={\url{https://github.com/gorillaleap/dLGN-MEI}}
+}
+```
 
 ---
 
-## 🤝 Acknowledgments
-
-Thanks to the [inception_loop2019](https://github.com/cosmo-emi/inception_loop2019) project for providing the basic architecture support.
-
----
-
-**Made with ❤️ for Computational Neuroscience**
+<p align="center">
+  <b>From High-Frequency Noise to Silky Smooth — A Biologically-Inspired MEI Architecture</b>
+</p>

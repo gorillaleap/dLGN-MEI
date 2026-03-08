@@ -37,7 +37,18 @@
       "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe -c \"import glob; files = glob.glob\\(''D:/mouse-lgn-movie-main/mouse-lgn-movie-main/movie_2025_04_22/inst0/*.png''\\); print\\(f''Total PNG files: {len\\(files\\)}''\\)\")",
       "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe generate_stim_mat.py)",
       "Bash(C:/Users/49851/.conda/envs/chatgpt/python.exe \"d:/Claud Code/train_pro_high_res.py\")",
-      "Bash(set PYTHONIOENCODING=utf-8)"
+      "Bash(set PYTHONIOENCODING=utf-8)",
+      "Bash(conda run -n chatg python generate_mei_atlas.py)",
+      "Bash(/c/ProgramData/Anaconda3/Scripts/conda run -n chatgpt python generate_mei_atlas.py)",
+      "Bash(where conda)",
+      "Bash(C:/Users/vipuser/anaconda3/envs/chatgpt/python.exe generate_mei_atlas.py)",
+      "Bash(C:/Users/vipuser/anaconda3/envs/chatgpt/python.exe validate_mei.py)",
+      "Bash(C:/Users/vipuser/anaconda3/envs/chatgpt/python.exe validate_mei_circular.py)",
+      "Bash(C:/Users/vipuser/anaconda3/envs/chatgpt/python.exe augmentation_circular_rf.py)",
+      "Bash(C:/Users/vipuser/anaconda3/envs/chatgpt/python.exe train_pro_high_res_laynorm.py)",
+      "Bash(C:/Users/vipuser/anaconda3/envs/chatgpt/python.exe -c \":*)",
+      "Bash(C:/Users/vipuser/anaconda3/envs/chatgpt/python.exe generate_mei_atlas_v2.py)",
+      "Bash(python train_circular_rf.py)"
     ]
   }
 }

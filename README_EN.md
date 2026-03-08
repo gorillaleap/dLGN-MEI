@@ -2,7 +2,7 @@
 
 **A Low-Frequency Specialized CNN Framework for Retinal Ganglion Cell Maximally Exciting Images (MEI)**
 
-English | [简体中文](README_CN.md)
+English | [简体中文](README.md)
 
 ---
 

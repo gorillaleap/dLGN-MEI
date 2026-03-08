@@ -9,11 +9,12 @@ English | [简体中文](README.md)
 ## Table of Contents
 
 - [1. Background & Problem Definition](#1-background--problem-definition)
-- [2. Our Solution](#2-our-solution)
-- [3. Installation](#3-installation)
-- [4. Usage & Execution](#4-usage--execution)
-- [5. Outputs & Directory Structure](#5-outputs--directory-structure)
-- [6. Key Findings & Results](#6-key-findings--results)
+- [2. Dataset & Experimental Setup](#2-dataset--experimental-setup)
+- [3. Our Solution](#3-our-solution)
+- [4. Installation](#4-installation)
+- [5. Usage & Execution](#5-usage--execution)
+- [6. Outputs & Directory Structure](#6-outputs--directory-structure)
+- [7. Key Findings & Results](#7-key-findings--results)
 - [Acknowledgments](#acknowledgments)
 
 ---
@@ -40,7 +41,107 @@ These **high-frequency aliasing artifacts** not only degrade MEI visual quality 
 
 ---
 
-## 2. Our Solution
+## 2. Dataset & Experimental Setup
+
+The digital twin model in this project is built upon real neurobiological experimental data. Below is a detailed description of the experimental design and data acquisition.
+
+### 2.1 Biological Recording Methodology
+
+We employed **two-photon calcium imaging** to record neural activity in the **dorsal Lateral Geniculate Nucleus (dLGN)** of **awake mice**:
+
+| Recording Parameter | Details |
+|---------------------|---------|
+| **Imaging Technique** | Two-photon excitation fluorescence microscopy |
+| **Target Brain Region** | Dorsal LGN (dLGN) — the relay station for visual information from retina to cortex |
+| **Cell Type** | Cart-positive retinal ganglion cell (RGC) axon terminals (boutons) |
+| **Calcium Indicator** | GCaMP series genetically-encoded calcium indicator |
+| **Recording Target** | Presynaptic boutons formed by RGC axons in dLGN |
+
+> **Biological Significance**: By recording RGC axon terminals rather than cell bodies, we directly measure the visual signals transmitted to dLGN, providing a unique perspective for understanding retino-thalamic information transfer.
+
+### 2.2 Visual Stimulation Paradigm
+
+The experiment employed a carefully designed visual stimulus sequence:
+
+```
+Stimulus Design: 48 distinct visual stimulus patterns
+Repetitions: Each stimulus presented 30 times (trials)
+Total Stimuli: 48 × 30 = 1,440 presentations
+```
+
+This repeated-measures design enables us to:
+- Calculate mean response characteristics for each neuron
+- Assess response reliability and noise levels
+- Construct a robust training dataset
+
+### 2.3 Data Matrix Construction
+
+From the extensive neural recordings, we rigorously selected **50 direction-selective (DS) boutons** to construct the core dataset for training the digital twin model. The dataset comprises three matrices:
+
+#### Stimulus Matrix
+
+```
+Dimensions: [N_samples × Image_Height × Image_Width]
+Content: 48 visual stimulus images × 30 repetitions
+Format: Grayscale images, Z-score normalized
+```
+
+#### Response Matrix
+
+```
+Dimensions: [N_samples × N_neurons] = [1440 × 50]
+Content: Calcium fluorescence responses from 50 DS boutons
+Processing: ΔF/F₀ normalization, Z-score standardization
+```
+
+#### Behavior Matrix
+
+```
+Dimensions: [N_samples × 2]
+Content: Synchronously recorded behavioral states of awake mice
+Features:
+  - Running: Locomotion speed (motor state)
+  - Pupil: Pupil size (arousal level)
+Purpose: Enable behavior modulation in the model
+```
+
+### 2.4 Data Matrix Relationship Diagram
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    Experimental Data Acquisition                 │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+           ┌───────────────────┼───────────────────┐
+           ▼                   ▼                   ▼
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│  Stimulus       │  │  Response       │  │  Behavior       │
+│  Matrix         │  │  Matrix         │  │  Matrix         │
+├─────────────────┤  ├─────────────────┤  ├─────────────────┤
+│ 48 stimuli      │  │ 50 DS boutons   │  │ Running speed   │
+│ × 30 trials     │  │ × 1440 samples  │  │ Pupil size      │
+│ = 1440 images   │  │                 │  │                 │
+└────────┬────────┘  └────────┬────────┘  └────────┬────────┘
+         │                    │                    │
+         └────────────────────┼────────────────────┘
+                              ▼
+              ┌───────────────────────────────┐
+              │    Digital Twin Training Data │
+              │    my_training_data.mat       │
+              └───────────────────────────────┘
+```
+
+### 2.5 Significance of Direction Selectivity (DS)
+
+We specifically selected **direction-selective (DS) boutons** as our research subjects because:
+
+1. **Clear Function**: DS neurons produce strongest responses to specific motion directions, serving as key units in visual motion processing
+2. **Interpretable Features**: MEI analysis can clearly reveal their orientation and direction preferences
+3. **Model Validation**: DS properties provide objective criteria for evaluating digital twin model accuracy
+
+---
+
+## 3. Our Solution
 
 ### Design Philosophy
 
@@ -48,7 +149,7 @@ We designed a **low-frequency specialized CNN architecture** that physically str
 
 ### Core Technologies
 
-#### 2.1 Multi-Scale Physical Blurring (Anti-Aliasing)
+#### 3.1 Multi-Scale Physical Blurring (Anti-Aliasing)
 
 ```
 Input Image → 3×3 AvgPool → 5×5 AvgPool → 7×7 AvgPool → Feature Extraction
@@ -56,7 +157,7 @@ Input Image → 3×3 AvgPool → 5×5 AvgPool → 7×7 AvgPool → Feature Extra
 
 Through three consecutive average pooling layers, we apply **physical low-pass filtering** before feature extraction, blocking high-frequency noise from entering the network at the source.
 
-#### 2.2 Large-Scale Convolution Kernel Design
+#### 3.2 Large-Scale Convolution Kernel Design
 
 | Layer | Kernel Size | Function |
 |-------|-------------|----------|
@@ -66,11 +167,11 @@ Through three consecutive average pooling layers, we apply **physical low-pass f
 
 Large convolution kernels naturally possess larger receptive fields and stronger smoothing effects, aligning with biological RGC receptive field properties.
 
-#### 2.3 Circular Receptive Field Mask
+#### 3.3 Circular Receptive Field Mask
 
 Simulating the circular visual field of biological retina, we apply a circular mask at the input stage, filling regions outside the circle with background gray values to avoid edge effects from square boundaries.
 
-#### 2.4 Parameter Efficiency
+#### 3.4 Parameter Efficiency
 
 ```
 Total Parameters: ≈ 330,000 (330K)
@@ -117,7 +218,7 @@ Achieving lightweight design while maintaining high performance, facilitating tr
 
 ---
 
-## 3. Installation
+## 4. Installation
 
 ### Requirements
 
@@ -170,9 +271,9 @@ If you encounter CUDA version mismatch, modify `pytorch-cuda` in `environment.ym
 
 ---
 
-## 4. Usage & Execution
+## 5. Usage & Execution
 
-### 4.1 Training the Digital Twin Model
+### 5.1 Training the Digital Twin Model
 
 **Script**: `train_circular_rf.py`
 
@@ -197,7 +298,7 @@ python train_circular_rf.py
 - `best_model_rf100_v9_330k.pth` - Trained model weights
 - SwanLab logs (training curves viewable on web)
 
-### 4.2 Batch MEI Generation & Analysis
+### 5.2 Batch MEI Generation & Analysis
 
 **Script**: `batch_mei_analysis.py`
 
@@ -221,7 +322,7 @@ python batch_mei_analysis.py
 - Regularization: TV Loss (1e-6 ~ 1e-5) + L2 (1e-4 ~ 1e-3)
 - Spatial Jitter: Enabled for first 1500 iterations
 
-### 4.3 Single Neuron Validation (Optional)
+### 5.3 Single Neuron Validation (Optional)
 
 **Script**: `validate_mei_circular.py`
 
@@ -232,7 +333,7 @@ python validate_mei_circular.py
 
 ---
 
-## 5. Outputs & Directory Structure
+## 6. Outputs & Directory Structure
 
 ### Project Directory
 
@@ -264,7 +365,7 @@ MEI-Visual-Neuron-Extraction/
 
 ### Output Files Explained
 
-#### 5.1 Neuron Comparison Images (`Neuron_XX_Comparison.png`)
+#### 6.1 Neuron Comparison Images (`Neuron_XX_Comparison.png`)
 
 Each image contains three columns:
 
@@ -274,7 +375,7 @@ Each image contains three columns:
 | **Seeded MEI** | MEI initialized from real image | Optimized enhanced stimulus |
 | **Random MEI** | MEI initialized from random noise | Model-discovered optimal pattern |
 
-#### 5.2 Data Summary Table (`MEI_Response_Summary.xlsx`)
+#### 6.2 Data Summary Table (`MEI_Response_Summary.xlsx`)
 
 Excel spreadsheet containing:
 
@@ -287,7 +388,7 @@ Excel spreadsheet containing:
 | `Ratio_Seeded` | Seeded enhancement = Response_Seeded / Response_Real |
 | `Ratio_Random` | Random enhancement = Response_Random / Response_Real |
 
-#### 5.3 Statistical Histograms (`Improvement_Histograms.png`)
+#### 6.3 Statistical Histograms (`Improvement_Histograms.png`)
 
 Shows MEI enhancement ratio distribution across 50 neurons:
 - Left: Seeded MEI enhancement distribution
@@ -297,9 +398,9 @@ Shows MEI enhancement ratio distribution across 50 neurons:
 
 ---
 
-## 6. Key Findings & Results
+## 7. Key Findings & Results
 
-### 6.1 Complete Elimination of High-Frequency Artifacts
+### 7.1 Complete Elimination of High-Frequency Artifacts
 
 | Comparison | Traditional Methods | Our Method |
 |------------|---------------------|------------|
@@ -308,14 +409,14 @@ Shows MEI enhancement ratio distribution across 50 neurons:
 | Edge aliasing | Rough | **Smooth transitions** |
 | Overall texture | Digital noise | **Silky smooth** |
 
-### 6.2 Biologically Plausible MEI Structures
+### 7.2 Biologically Plausible MEI Structures
 
 Generated MEIs exhibit features consistent with RGC receptive field properties:
 - **Gabor waves**: Smooth sinusoidal modulation structures
 - **Gaussian envelopes**: Spatial decay with strong center, weak periphery
 - **Orientation selectivity**: Clear orientation preferences
 
-### 6.3 Random Seed Validation Experiments
+### 7.3 Random Seed Validation Experiments
 
 Through Random MEI experiments, we demonstrated:
 
@@ -326,7 +427,7 @@ This proves that:
 2. The low-frequency specialized architecture effectively constrains the search space
 3. The MEI method can reveal intrinsic principles of neural coding
 
-### 6.4 Quantitative Results Summary
+### 7.4 Quantitative Results Summary
 
 ```
 Seeded MEI Average Enhancement: 1.5x ~ 2.0x

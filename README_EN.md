@@ -293,14 +293,7 @@ Additional `small` and `small-55` mask configuration files are packaged in the a
 
 1. **Extract the required mask file**: Unzip the mask configuration of the corresponding size from the archive
 2. **Replace default configuration**: Overwrite the default mask file in the project with the extracted file
-3. **Modify code parameters**: Adjust the `rf_diameter` parameter in training/generation scripts to the corresponding value
 
-**Code Example**:
-```python
-# Using small-55 configuration (55 pixels)
-rf_diameter = 55
-circular_mask = CircularMask(size=55, radius=27.5)
-```
 
 ### 5.1 Training the Digital Twin Model
 

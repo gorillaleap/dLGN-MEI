@@ -293,14 +293,6 @@ python -c "import torch; print(f'CUDA 可用: {torch.cuda.is_available()}')"
 
 1. **解压所需 Mask 文件**：从压缩包中提取对应尺寸的 Mask 配置
 2. **替换默认配置**：将解压的文件覆盖项目中的默认 Mask 文件
-3. **修改代码参数**：在训练/生成脚本中将 `rf_diameter` 参数调整为对应值
-
-**代码示例**：
-```python
-# 使用 small-55 配置（55 像素）
-rf_diameter = 55
-circular_mask = CircularMask(size=55, radius=27.5)
-```
 
 ### 5.1 训练数字孪生模型
 

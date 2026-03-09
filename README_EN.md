@@ -273,6 +273,35 @@ If you encounter CUDA version mismatch, modify `pytorch-cuda` in `environment.ym
 
 ## 5. Usage & Execution
 
+### 5.0 Receptive Field Size & Mask Configuration
+
+This project supports circular receptive field masks of different sizes. Users can select the appropriate configuration based on the biological receptive field size of their target neurons.
+
+#### Available Mask Options
+
+| Mask Name | Diameter (pixels) | Equivalent Original RF | Use Case |
+|-----------|-------------------|------------------------|----------|
+| **Default** | 100 px | 50 px | Standard configuration, suitable for most RGC neurons |
+| **small** | 60 px | 30 px | Smaller receptive field, optimized for sparse stimuli |
+| **small-55** | 55 px | 27.5 px | Extreme center focus, maximized signal-to-noise ratio |
+
+> **Note**: Due to the 2x spatial scale remapping (512×640 → 1024×1280), dividing the crop size by 2 gives the equivalent receptive field size in the original image.
+
+#### How to Switch Mask Configuration
+
+Additional `small` and `small-55` mask configuration files are packaged in the accompanying archive. Follow these steps to switch configurations based on your biological expectations for target neuron receptive fields:
+
+1. **Extract the required mask file**: Unzip the mask configuration of the corresponding size from the archive
+2. **Replace default configuration**: Overwrite the default mask file in the project with the extracted file
+3. **Modify code parameters**: Adjust the `rf_diameter` parameter in training/generation scripts to the corresponding value
+
+**Code Example**:
+```python
+# Using small-55 configuration (55 pixels)
+rf_diameter = 55
+circular_mask = CircularMask(size=55, radius=27.5)
+```
+
 ### 5.1 Training the Digital Twin Model
 
 **Script**: `train_circular_rf.py`
